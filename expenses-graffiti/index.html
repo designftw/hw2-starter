@@ -7,24 +7,32 @@
         <script type="importmap">
             {
                 "imports": {
-                    "vue": "https://cdn.jsdelivr.net/npm/vue/dist/vue.esm-browser.js",
-                    "@graffiti-garden/implementation-local": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-local/dist/index.browser.js",
-                    "@graffiti-garden/wrapper-vue": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue/dist/plugin.mjs",
-                    "@graffiti-garden/wrapper-vue-personal-data": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue-personal-data/dist/plugin.mjs"
+                    "vue": "https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.js",
+                    "@graffiti-garden/implementation-local": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-local@1.2/dist/browser/index.js",
+                    "@graffiti-garden/wrapper-vue": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue@1.2/dist/browser/plugin.mjs",
+                    "@graffiti-garden/wrapper-vue-personal-data": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue-personal-data@0.1/dist/plugin.mjs"
                 }
             }
         </script>
         <link rel="stylesheet" href="style.css" />
+        <script src="index.js" type="module"></script>
     </head>
     <body>
-        <div id="app">
-            <!-- Basic authentication UI (needed for saving) -->
+        <div id="app"></div>
+        <template id="template">
+            <!-- Basic authentication UI (needed for saving, feel free to change) -->
             <header>
                 <span v-if="$graffitiSession.value">
-                    Logged in as {{ $graffitiSession.value.actor }}
+                    Logged in as
+                    <graffiti-actor-to-handle :actor="$graffitiSession.value.actor">
+                    </graffiti-actor-to-handle>
+
                     <button @click="$graffiti.logout($graffitiSession.value)">
                         Log out
                     </button>
+                </span>
+                <span v-else-if="$graffitiSession.value===undefined">
+                    <em>Loading...</em>
                 </span>
                 <button v-else @click="$graffiti.login()">Log in</button>
             </header>
@@ -35,15 +43,12 @@
                 :session="$graffitiSession.value"
                 v-model="myData"
                 name="my-expense-data"
-                :schema="{}"
-                v-slot="{ save }"
+                v-slot="{ save, isSaving }"
             >
-                <button @click="save()">Save</button>
+                <button @click="save()" :disabled="isSaving">
+                  {{ isSaving ? "Saving..." : "Save" }}
+                </button>
             </graffiti-personal-data>
-
-            <!-- App UI here -->
-        </div>
-
-        <script src="index.js" type="module"></script>
+        </template>
     </body>
 </html>
